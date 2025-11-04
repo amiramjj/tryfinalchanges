@@ -298,7 +298,38 @@ def calculate_score(row):
     if s is not None: scores.append(s); max_weights.append(THEME_WEIGHTS["cuisine"])
     if not scores:
         return 0, "Neutral", theme_scores, []
-    base_score = sum(scores) / sum(max_weights) * 100
+    # ---------------- PRIORITY-BASED AGGREGATION ----------------
+    importance_weights = {
+        "Special Cases Reason": 6,   # highest importance
+        "Household & Kids Reason": 5,
+        "Living Reason": 4,
+        "Pets Reason": 3,
+        "Cuisine Reason": 2,
+        "Nationality Reason": 1      # lowest importance
+    }
+    
+    weighted_sum = 0
+    total_importance = 0
+    
+    for theme, importance in importance_weights.items():
+        if theme in theme_scores:
+            reason = theme_scores[theme]
+            # interpret qualitative reason text into a numeric subscore
+            if "Perfect" in reason or "Match" in reason:
+                subscore = 100
+            elif "Partial" in reason:
+                subscore = 70
+            elif "Neutral" in reason:
+                subscore = 50
+            else:
+                subscore = 0
+            weighted_sum += subscore * importance
+            total_importance += importance
+    
+    # normalize weighted average to percentage
+    base_score = weighted_sum / total_importance if total_importance > 0 else 0
+    # ------------------------------------------------------------
+
     bonus, bonus_reasons = score_bonuses(row)
     final_score = min(base_score + bonus, 100)
     return round(final_score, 1), theme_scores, bonus_reasons
