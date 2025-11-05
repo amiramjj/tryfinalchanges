@@ -29,7 +29,7 @@ def score_household_kids(client, maid, exp):
 
     # Case 1: Client unspecified → Neutral
     if client == "unspecified":
-        return None, "Neutral: client did not specify household type"
+        return THEME_WEIGHTS["household_kids"], "Match: client did not specify household type (flexible preference)"
 
     # Define experience set for readability
     has_exp = exp in ["lessthan2", "above2", "both"]
@@ -77,7 +77,7 @@ def score_household_kids(client, maid, exp):
 def score_special_cases(client, maid):
     w = THEME_WEIGHTS["special_cases"]
     if client == "unspecified":
-        return None, "Neutral: client did not specify special cases"
+        return THEME_WEIGHTS["special_cases"], "Match: client did not specify special cases (flexible preference)"
     if client == "elderly":
         if maid in ["elderly_experienced", "elderly_and_special"]:
             return w, "Match: elderly supported"
@@ -99,7 +99,7 @@ def score_special_cases(client, maid):
 def score_pets(client, maid, handling):
     w = THEME_WEIGHTS["pets"]
     if client == "unspecified":
-        return None, "Neutral: client did not specify pets"
+        return THEME_WEIGHTS["pets"], "Match: client did not specify pet preference (flexible preference)"
     if client == "cat":
         if maid in ["refuses_cat", "refuses_both_pets"]:
             if handling in ["cats", "both"]:
@@ -135,10 +135,10 @@ def score_living(client, maid):
     # Case 1: Both sides unspecified or unrestricted → Match
     if client == "unspecified" and maid == "no_restriction_living_arrangement":
         return w, "Match: both sides unrestricted, flexible and compatible"
-
-    # Case 2: Client unspecified → Neutral
+    
+    # Case 2: Client unspecified → treat as flexible preference
     if client == "unspecified":
-        return None, "Neutral: client did not specify living arrangement"
+        return THEME_WEIGHTS["living"], "Match: client did not specify living arrangement (flexible preference)"
 
     # Case 3: Maid requires private room but client doesn't provide one → Mismatch
     if "requires_private_room" in maid and "private_room" not in client:
@@ -186,8 +186,10 @@ def score_nationality(client, maid):
 
 def score_cuisine(client, maid_flags):
     w = THEME_WEIGHTS["cuisine"]
+    # if client == "unspecified":
+    #     return None, "Neutral: client did not specify cuisine"
     if client == "unspecified":
-        return None, "Neutral: client did not specify cuisine"
+        return THEME_WEIGHTS["cuisine"], "Match: client did not specify cuisine (flexible preference)"
     prefs = client.split("+")
     prefs = [p.strip() for p in prefs]
     matches = 0
