@@ -27,10 +27,9 @@ BONUS_CAP = 10  # max total bonus %
 def score_household_kids(client, maid, exp):
     w = THEME_WEIGHTS["household_kids"]
 
-    # Case 1: Client unspecified → Open match
+    # Case 1: Client unspecified → Neutral
     if client == "unspecified":
-        return w, "Open: client did not specify household type, any arrangement acceptable"
-
+        return None, "Neutral: client did not specify household type"
 
     # Define experience set for readability
     has_exp = exp in ["lessthan2", "above2", "both"]
@@ -78,7 +77,7 @@ def score_household_kids(client, maid, exp):
 def score_special_cases(client, maid):
     w = THEME_WEIGHTS["special_cases"]
     if client == "unspecified":
-        return w, "Open: client did not specify special cases, any profile acceptable"
+        return None, "Neutral: client did not specify special cases"
     if client == "elderly":
         if maid in ["elderly_experienced", "elderly_and_special"]:
             return w, "Match: elderly supported"
@@ -100,7 +99,7 @@ def score_special_cases(client, maid):
 def score_pets(client, maid, handling):
     w = THEME_WEIGHTS["pets"]
     if client == "unspecified":
-        return w, "Open: client did not specify pet preference, any handling acceptable"
+        return None, "Neutral: client did not specify pets"
     if client == "cat":
         if maid in ["refuses_cat", "refuses_both_pets"]:
             if handling in ["cats", "both"]:
@@ -133,13 +132,13 @@ def score_pets(client, maid, handling):
 def score_living(client, maid):
     w = THEME_WEIGHTS["living"]
 
-    # # Case 1: Both sides unspecified or unrestricted → Match
-    # if client == "unspecified" and maid == "no_restriction_living_arrangement":
-    #     return w, "Match: both sides unrestricted, flexible and compatible"
+    # Case 1: Both sides unspecified or unrestricted → Match
+    if client == "unspecified" and maid == "no_restriction_living_arrangement":
+        return w, "Match: both sides unrestricted, flexible and compatible"
 
     # Case 2: Client unspecified → Neutral
     if client == "unspecified":
-        return w, "Open: client did not specify living arrangement, any setup acceptable"
+        return None, "Neutral: client did not specify living arrangement"
 
     # Case 3: Maid requires private room but client doesn't provide one → Mismatch
     if "requires_private_room" in maid and "private_room" not in client:
@@ -188,7 +187,7 @@ def score_nationality(client, maid):
 def score_cuisine(client, maid_flags):
     w = THEME_WEIGHTS["cuisine"]
     if client == "unspecified":
-        return w, "Open: client did not specify cuisine preference, any cuisine acceptable"
+        return None, "Neutral: client did not specify cuisine"
     prefs = client.split("+")
     prefs = [p.strip() for p in prefs]
     matches = 0
@@ -316,7 +315,7 @@ def calculate_score(row):
         if theme in theme_scores:
             reason = theme_scores[theme]
             # interpret qualitative reason text into a numeric subscore
-            if "Perfect" in reason or "Match" in reason or "Open" in reason:
+            if "Perfect" in reason or "Match" in reason:
                 subscore = 100
             elif "Partial" in reason:
                 subscore = 70
