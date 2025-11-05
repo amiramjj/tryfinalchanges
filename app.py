@@ -133,9 +133,9 @@ def score_pets(client, maid, handling):
 def score_living(client, maid):
     w = THEME_WEIGHTS["living"]
 
-    # Case 1: Both sides unspecified or unrestricted → Match
-    if client == "unspecified" and maid == "no_restriction_living_arrangement":
-        return w, "Match: both sides unrestricted, flexible and compatible"
+    # # Case 1: Both sides unspecified or unrestricted → Match
+    # if client == "unspecified" and maid == "no_restriction_living_arrangement":
+    #     return w, "Match: both sides unrestricted, flexible and compatible"
 
     # Case 2: Client unspecified → Neutral
     if client == "unspecified":
