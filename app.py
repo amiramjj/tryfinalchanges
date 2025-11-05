@@ -701,7 +701,38 @@ if uploaded_file:
                         "The uplift margin between current and optimal alignment, a direct measure of operational headroom." 
                         "Across all placements, moree than 2,300 clients experienced improved match quality under algorithmic optimization."
                     )
-    
+            import numpy as np
+
+           
+            # --- Align by client_name
+            merged = results_df[["client_name", "Final Score %"]].rename(columns={"Final Score %": "Tagged Score"})
+            merged = merged.merge(optimal_df[["client_name", "Final Score %"]].rename(columns={"Final Score %": "Best Score"}),
+                                  on="client_name", how="inner")
+            
+            # --- Compute uplift per client
+            merged["Improvement (pp)"] = merged["Best Score"] - merged["Tagged Score"]
+            
+            # --- Core metrics
+            avg_tagged = merged["Tagged Score"].mean()
+            avg_best   = merged["Best Score"].mean()
+            avg_improve = avg_best - avg_tagged
+            
+            median_improve = merged["Improvement (pp)"].median()
+            pct_above5 = (merged["Improvement (pp)"] > 5).mean() * 100  # percent of clients with >5 pp uplift
+            
+            # --- Display results
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("Avg Tagged Match Score", f"{avg_tagged:.1f}%")
+            col2.metric("Avg Best Match Score", f"{avg_best:.1f}%")
+            col3.metric("Potential Improvement", f"+{avg_improve:.1f} pp")
+            col4.metric("Median Improvement", f"+{median_improve:.1f} pp")
+            
+            st.markdown(f"**Clients with >5 pp uplift:** {pct_above5:.1f}%")
+            
+            # Optional: visualize distribution
+            st.write("### Distribution of Improvements")
+            st.bar_chart(merged["Improvement (pp)"])
+
             # -------------------------------
             # Client Drilldown: Tagged vs Best
             # -------------------------------
