@@ -660,76 +660,46 @@ if uploaded_file:
     st.write(f"Tagged: {len(df) if df is not None else 0}, Best: {len(best_client_df) if best_client_df is not None else 0}")
 
 
-    # ---------------- Tab 5: Summary Metrics ----------------
+    # ---------------- Tab 5: Summary Metrics ----------------  
     with tab5:
         st.subheader("Summary Metrics")
     
-        # --- Safety: ensure datasets are available
-        if df is None or best_client_df is None:
-            st.warning("⚠️ Run Tab 1 (Matching Scores) and Tab 2 (Optimal Matches) before viewing Summary Metrics.")
+        # Retrieve data from session
+        results_df = st.session_state.get("results_df")
+        optimal_df = st.session_state.get("optimal_df")
+    
+        if results_df is None or optimal_df is None:
+            st.warning("⚠️ Please run Tab 1 (Matching Scores) and Tab 2 (Optimal Matches) first.")
         else:
-            # ✅ Debug check (temporary)
-            st.write(f"Tagged: {len(df)}, Best: {len(best_client_df)}")
-    
-            # --- Safety: ensure columns exist
-            if "match_score_pct" not in df.columns or "match_score_pct" not in best_client_df.columns:
-                st.error("Required column 'match_score_pct' not found. Please compute match scores first.")
-            else:
-                # ---------------- Averages ----------------
-                avg_tagged = df["match_score_pct"].mean()
-                avg_best = best_client_df["match_score_pct"].mean()
-                delta = avg_best - avg_tagged
-    
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Avg Tagged Match Score", f"{avg_tagged:.1f}%")
-                    st.caption(
-                        "Represents current placement quality across tagged assignments. "
-                        "Lower averages indicate suboptimal client–maid pairings."
-                    )
-    
-                with col2:
-                    st.metric("Avg Best Match Score", f"{avg_best:.1f}%")
-                    st.caption(
-                        "Shows the achievable average if each client were paired with their highest-fit maid "
-                        "based on the algorithmic matching logic."
-                    )
-    
-                with col3:
-                    st.metric("Potential Improvement", f"{delta:+.1f}%")
-                    st.caption(
-                        "The uplift margin between current and optimal alignment, a direct measure of operational headroom." 
-                        "Across all placements, moree than 2,300 clients experienced improved match quality under algorithmic optimization."
-                    )
             import numpy as np
-
-           
+    
             # --- Align by client_name
             merged = results_df[["client_name", "Final Score %"]].rename(columns={"Final Score %": "Tagged Score"})
-            merged = merged.merge(optimal_df[["client_name", "Final Score %"]].rename(columns={"Final Score %": "Best Score"}),
-                                  on="client_name", how="inner")
-            
+            merged = merged.merge(
+                optimal_df[["client_name", "Final Score %"]].rename(columns={"Final Score %": "Best Score"}),
+                on="client_name", how="inner"
+            )
+    
             # --- Compute uplift per client
             merged["Improvement (pp)"] = merged["Best Score"] - merged["Tagged Score"]
-            
+    
             # --- Core metrics
             avg_tagged = merged["Tagged Score"].mean()
-            avg_best   = merged["Best Score"].mean()
+            avg_best = merged["Best Score"].mean()
             avg_improve = avg_best - avg_tagged
-            
             median_improve = merged["Improvement (pp)"].median()
-            pct_above5 = (merged["Improvement (pp)"] > 5).mean() * 100  # percent of clients with >5 pp uplift
-            
-            # --- Display results
+            pct_above5 = (merged["Improvement (pp)"] > 5).mean() * 100
+    
+            # --- Display metrics
             col1, col2, col3, col4 = st.columns(4)
             col1.metric("Avg Tagged Match Score", f"{avg_tagged:.1f}%")
             col2.metric("Avg Best Match Score", f"{avg_best:.1f}%")
             col3.metric("Potential Improvement", f"+{avg_improve:.1f} pp")
             col4.metric("Median Improvement", f"+{median_improve:.1f} pp")
-            
+    
             st.markdown(f"**Clients with >5 pp uplift:** {pct_above5:.1f}%")
-            
-            # Optional: visualize distribution
+    
+            # --- Visualization
             st.write("### Distribution of Improvements")
             st.bar_chart(merged["Improvement (pp)"])
 
