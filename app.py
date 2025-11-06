@@ -135,18 +135,19 @@ def score_living(client, maid):
         return None, "Neutral: client did not specify living arrangement"
     if "no_restriction_living_arrangement" in maid:
         return w, "Match: maid is fully flexible and accepts all living arrangements"
-     if "abu_dhabi" in client:
-            if "refuses_abu_dhabi" in maid:
-                if "requires_private_room" in maid and "private_room" in client:
-                    return int(w * 0.6), "Partial match: maid requires private room (satisfied) but refuses Abu Dhabi where client is located"
-                else:
-                    return 0, "Mismatch: client is in Abu Dhabi but maid refuses Abu Dhabi"
-            elif "requires_private_room" in maid and "private_room" in client:
-                return w, "Perfect match: maid requires private room and accepts Abu Dhabi posting"
-            elif "requires_private_room" in maid and "private_room" not in client:
-                return int(w * 0.6), "Partial: maid accepts Abu Dhabi but requires private room which is not offered"
+    if "abu_dhabi" in client:
+        if "refuses_abu_dhabi" in maid:
+            if "requires_private_room" in maid and "private_room" in client:
+                return int(w * 0.6), "Partial match: maid requires private room (satisfied) but refuses Abu Dhabi where client is located"
             else:
-                return w, "Match: maid accepts Abu Dhabi posting"
+                return 0, "Mismatch: client is in Abu Dhabi but maid refuses Abu Dhabi"
+        elif "requires_private_room" in maid and "private_room" in client:
+            return w, "Perfect match: maid requires private room and accepts Abu Dhabi posting"
+        elif "requires_private_room" in maid and "private_room" not in client:
+            return int(w * 0.6), "Partial: maid accepts Abu Dhabi but requires private room which is not offered"
+        else:
+            return w, "Match: maid accepts Abu Dhabi posting"
+
     if "private_room" in client:
         if "requires_private_room" in maid:
             return w, "Perfect match: maid requires private room and client offers it"
