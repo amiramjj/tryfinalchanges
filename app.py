@@ -714,41 +714,40 @@ if uploaded_file:
             col1.metric("Avg Tagged Match Score", f"{avg_tagged:.1f}%")
             col2.metric("Avg Best Match Score", f"{avg_best:.1f}%")
             col3.metric("Potential Improvement", f"+{avg_improve:.1f} pp")
-            col4.metric("Median Improvement", f"+{median_improve:.1f} pp")
     
             st.markdown(f"**Clients with >5 pp uplift:** {pct_above5:.1f}%")
     
 
-            # --- Visualization (Improvement Distribution)
-            import plotly.express as px
+            # # --- Visualization (Improvement Distribution)
+            # import plotly.express as px
             
-            st.write("### Distribution of Improvements (Histogram)")
+            # st.write("### Distribution of Improvements (Histogram)")
             
-            fig = px.histogram(
-                merged,
-                x="Improvement (pp)",
-                nbins=30,
-                title="Distribution of Match Score Improvements",
-                labels={"Improvement (pp)": "Improvement (percentage points)"},
-            )
+            # fig = px.histogram(
+            #     merged,
+            #     x="Improvement (pp)",
+            #     nbins=30,
+            #     title="Distribution of Match Score Improvements",
+            #     labels={"Improvement (pp)": "Improvement (percentage points)"},
+            # )
             
-            fig.update_layout(
-                bargap=0.1,
-                template="plotly_dark",
-                xaxis_title="Improvement (pp)",
-                yaxis_title="Number of Clients"
-            )
+            # fig.update_layout(
+            #     bargap=0.1,
+            #     template="plotly_dark",
+            #     xaxis_title="Improvement (pp)",
+            #     yaxis_title="Number of Clients"
+            # )
             
-            # Add a line for mean uplift
-            fig.add_vline(
-                x=avg_improve,
-                line_dash="dash",
-                line_color="orange",
-                annotation_text=f"Mean: {avg_improve:.1f} pp",
-                annotation_position="top right"
-            )
+            # # Add a line for mean uplift
+            # fig.add_vline(
+            #     x=avg_improve,
+            #     line_dash="dash",
+            #     line_color="orange",
+            #     annotation_text=f"Mean: {avg_improve:.1f} pp",
+            #     annotation_position="top right"
+            # )
             
-            st.plotly_chart(fig, use_container_width=True)
+            # st.plotly_chart(fig, use_container_width=True)
 
 
             # -------------------------------
