@@ -131,41 +131,35 @@ def score_pets(client, maid, handling):
 
 def score_living(client, maid):
     w = THEME_WEIGHTS["living"]
-
-    # Case 1: Both sides unspecified or unrestricted → Match
-    if client == "unspecified" and maid == "no_restriction_living_arrangement":
-        return w, "Match: both sides unrestricted, flexible and compatible"
-
-    # Case 2: Client unspecified → Neutral
     if client == "unspecified":
         return None, "Neutral: client did not specify living arrangement"
-
-    # Case 3: Maid requires private room but client doesn't provide one → Mismatch
-    if "requires_private_room" in maid and "private_room" not in client:
-        return 0, "Mismatch: maid requires private room but client did not offer one"
-
-    # Case 4: Maid refuses Abu Dhabi but client does not mention Abu Dhabi → Match (irrelevant refusal)
-    if "refuses_abu_dhabi" in maid and "abu_dhabi" not in client:
-        return w, "Match: maid refuses Abu Dhabi and client not in Abu Dhabi"
-
-    # Case 5: Client and maid both require private room → Perfect match
-    if client in ["private_room", "live_out+private_room"] and "requires_private_room" in maid:
-        return w, "Match: both client and maid require private room"
-    
-    # Case 6: Client requires private room (maid doesn’t specifically require it) → Standard match
-    if client in ["private_room", "live_out+private_room"]:
-        return w, "Match: private room requirement satisfied"
-
-    # Case 7: Client requires Abu Dhabi posting → check maid’s refusal
-    if client in ["private_room+abu_dhabi", "live_out+private_room+abu_dhabi"]:
-        if "refuses_abu_dhabi" in maid:
-            return 0, "Mismatch: maid refuses Abu Dhabi"
+    if "no_restriction_living_arrangement" in maid:
+        return w, "Match: maid is fully flexible and accepts all living arrangements"
+     if "abu_dhabi" in client:
+            if "refuses_abu_dhabi" in maid:
+                if "requires_private_room" in maid and "private_room" in client:
+                    return int(w * 0.6), "Partial match: maid requires private room (satisfied) but refuses Abu Dhabi where client is located"
+                else:
+                    return 0, "Mismatch: client is in Abu Dhabi but maid refuses Abu Dhabi"
+            elif "requires_private_room" in maid and "private_room" in client:
+                return w, "Perfect match: maid requires private room and accepts Abu Dhabi posting"
+            elif "requires_private_room" in maid and "private_room" not in client:
+                return int(w * 0.6), "Partial: maid accepts Abu Dhabi but requires private room which is not offered"
+            else:
+                return w, "Match: maid accepts Abu Dhabi posting"
+    if "private_room" in client:
+        if "requires_private_room" in maid:
+            return w, "Perfect match: maid requires private room and client offers it"
+        elif "refuses_abu_dhabi" in maid:
+            return w, "Match: maid refuses Abu Dhabi but client not in Abu Dhabi (no issue)"
         else:
-            return w, "Match: Abu Dhabi posting acceptable"
+            return int(w * 0.9), "Match: client offers private room though maid did not require it"
+    if "requires_private_room" in maid and "private_room" not in client:
+        return 0, "Mismatch: maid requires private room but client does not offer one"
+    if "refuses_abu_dhabi" in maid and "abu_dhabi" not in client:
+        return w, "Match: maid refuses Abu Dhabi but client not in Abu Dhabi (no conflict)"
 
-    # Case 8: Default → Neutral
-    return None, "Neutral"
-
+    return int(w * 0.8), "Match: general compatibility in living preferences"
 
 def score_nationality(client, maid):
     w = THEME_WEIGHTS["nationality"]
