@@ -30,6 +30,8 @@ def score_household_kids(client, maid, exp):
     # Case 1: Client unspecified → Neutral
     if client == "unspecified":
         return None, "Neutral: client did not specify household type"
+    if client == "no_kids":
+        return None, "Client explicitly does not require childcare experience"
 
     # Define experience set for readability
     has_exp = exp in ["lessthan2", "above2", "both"]
@@ -78,6 +80,8 @@ def score_special_cases(client, maid):
     w = THEME_WEIGHTS["special_cases"]
     if client == "unspecified":
         return None, "Neutral: client did not specify special cases"
+    if client == "no_special_cases":
+        return None, "Client explicitly does not require elderly or special-needs support"
     if client == "elderly":
         if maid in ["elderly_experienced", "elderly_and_special"]:
             return w, "Match: elderly supported"
@@ -100,6 +104,8 @@ def score_pets(client, maid, handling):
     w = THEME_WEIGHTS["pets"]
     if client == "unspecified":
         return None, "Neutral: client did not specify pets"
+    if client == "no_pets":
+        return None, "Client explicitly does not require pet-handling experience"
     if client == "cat":
         if maid in ["refuses_cat", "refuses_both_pets"]:
             if handling in ["cats", "both"]:
@@ -512,16 +518,11 @@ if uploaded_file:
         st.write("### Try Your Own Preferences")
     
         # Input widgets
-        c_household = st.selectbox("Household Type", ["unspecified", "baby", "many_kids", "baby_and_kids"])
-        c_special = st.selectbox("Special Cases", ["unspecified", "elderly", "special_needs", "elderly_and_special"])
-        c_pets = st.selectbox("Pet Type", ["unspecified", "cat", "dog", "both"])
-        c_living = st.selectbox("Living Arrangement", [
-            "unspecified", "private_room", "live_out+private_room",
-            "private_room+abu_dhabi", "live_out+private_room+abu_dhabi"
-        ])
-        c_nationality = st.selectbox("Nationality Preference", [
-            "any", "filipina", "ethiopian maid", "west african nationality", "indian"
-        ])
+        c_household = st.selectbox("Household Type", ["unspecified", "no_kids", "baby", "many_kids", "baby_and_kids"])
+        c_special = st.selectbox("Special Cases", ["unspecified", "no_special_cases", "elderly", "special_needs", "elderly_and_special"])
+        c_pets = st.selectbox("Pet Type", ["unspecified", "no_pets", "cat", "dog", "both"])
+        c_living = st.selectbox("Living Arrangement", ["unspecified", "private_room", "live_out+private_room","private_room+abu_dhabi", "live_out+private_room+abu_dhabi"])
+        c_nationality = st.selectbox("Nationality Preference", ["any", "filipina", "ethiopian maid", "west african nationality", "indian"])
         c_cuisine = st.multiselect("Cuisine Preference", ["lebanese", "khaleeji", "international"])
         cuisine_pref = "+".join(c_cuisine) if c_cuisine else "unspecified"
     
