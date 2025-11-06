@@ -330,25 +330,25 @@ def calculate_score(row):
     #         total_importance += importance
 
     for theme, importance in importance_weights.items():
-    if theme in theme_scores:
-        reason = theme_scores[theme]
-
-        # interpret qualitative reason text into a numeric subscore
-        if "explicitly does not require" in reason:
-            subscore = None  # Exclude completely
-        elif "Perfect" in reason or "Match" in reason:
-            subscore = 100
-        elif "Partial" in reason:
-            subscore = 70
-        elif "Neutral" in reason:
-            subscore = 50
-        else:
-            subscore = 0
-
-        # only count in weighted average if included
-        if subscore is not None:
-            weighted_sum += subscore * importance
-            total_importance += importance
+        if theme in theme_scores:
+            reason = theme_scores[theme]
+    
+            # interpret qualitative reason text into a numeric subscore
+            if "explicitly does not require" in reason:
+                subscore = None  # Exclude completely
+            elif "Perfect" in reason or "Match" in reason:
+                subscore = 100
+            elif "Partial" in reason:
+                subscore = 70
+            elif "Neutral" in reason:
+                subscore = 50
+            else:
+                subscore = 0
+    
+            # only count in weighted average if included
+            if subscore is not None:
+                weighted_sum += subscore * importance
+                total_importance += importance
             
     # normalize weighted average to percentage
     base_score = weighted_sum / total_importance if total_importance > 0 else 0
