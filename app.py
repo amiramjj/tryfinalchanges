@@ -208,7 +208,7 @@ def score_cuisine(client, maid_flags):
         if matches == 2:
             return int(w * 0.8), "Partial match: 2 of 3 cuisines covered"
         if matches == 1:
-            return int(w * 0.5), "Weak partial match: 1 of 3 cuisines covered"
+            return int(w * 0.5), "Partial match: 1 of 3 cuisines covered"
     return int(w * (matches / len(prefs))), f"Partial match: {matches} of {len(prefs)} cuisines covered"
 
 def score_bonuses(row):
@@ -318,7 +318,7 @@ def calculate_score(row):
             # interpret qualitative reason text into a numeric subscore
             if "explicitly does not require" in reason:
                 subscore = None  # Exclude completely
-            if "Perfect" in reason or "Match" in reason:
+            elif "Perfect" in reason or "Match" in reason:
                 subscore = 100
             elif "Partial" in reason:
                 subscore = 70
