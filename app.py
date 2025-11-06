@@ -316,6 +316,8 @@ def calculate_score(row):
         if theme in theme_scores:
             reason = theme_scores[theme]
             # interpret qualitative reason text into a numeric subscore
+            if "explicitly does not require" in reason:
+                subscore = None  # Exclude completely
             if "Perfect" in reason or "Match" in reason:
                 subscore = 100
             elif "Partial" in reason:
