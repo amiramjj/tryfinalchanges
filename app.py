@@ -623,9 +623,26 @@ if uploaded_file:
                         if st.button(f"Maid {mid}", key=f"maid_lang_{lang_name}_{mid}"):
                             maid_row = maids_df[maids_df["maid_id"] == mid].iloc[0]
                             st.markdown(f"### Maid {maid_row['maid_id']}")
-                            for col in maid_cols + lang_cols:
-                                value = maid_row[col]
-                                st.markdown(f"**{col.replace('_', ' ').capitalize()}:** {value}")
+                            maid_row = maid_row.fillna("unspecified")
+                            languages = [col.replace("maidspeaks_", "").capitalize() for col in lang_cols if maid_row[col] == 1]
+                            cuisines = [c.split("_")[-1].capitalize() for c in ["maid_cooking_lebanese", "maid_cooking_khaleeji", "maid_cooking_international"] if maid_row.get(c, 0) == 1]
+                            
+                            summary_parts = [
+                                f"Maid **{maid_row['maid_id']}** is {maid_row.get('maid_grouped_nationality', 'unspecified')} and speaks {', '.join(languages) if languages else 'no listed languages'}.",
+                                f"She can cook {', '.join(cuisines) if cuisines else 'no specified cuisines'}.",
+                                f"Household preference: {maid_row.get('maidmts_household_type', 'unspecified').replace('_', ' ')}.",
+                                f"Pet preference: {maid_row.get('maidmts_pet_type', 'unspecified').replace('_', ' ')}.",
+                                f"Day-off policy: {maid_row.get('maidmts_dayoff_policy', 'unspecified').replace('_', ' ')}.",
+                                f"Living arrangement: {maid_row.get('maidmts_living_arrangement', 'unspecified').replace('_', ' ')}.",
+                                f"Caregiving profile: {maid_row.get('maidpref_caregiving_profile', 'unspecified').replace('_', ' ')}.",
+                                f"Education: {maid_row.get('maidpref_education', 'unspecified').replace('_', ' ')}.",
+                                f"Personality: {maid_row.get('maidpref_personality', 'unspecified').replace('_', ' ')}.",
+                                f"Travel preference: {maid_row.get('maidpref_travel', 'unspecified').replace('_', ' ')}.",
+                                f"Smoking: {maid_row.get('maidpref_smoking', 'unspecified').replace('_', ' ')}.",
+                                f"Years of experience: {maid_row.get('years_of_experience', 'unspecified')}."
+                            ]
+                            
+                            st.markdown("<br>".join(summary_parts), unsafe_allow_html=True)
     
         else:
             # Normal grouping for all other features
@@ -637,10 +654,26 @@ if uploaded_file:
                         if st.button(f"Maid {mid}", key=f"maid_{feature_choice}_{mid}"):
                             maid_row = maids_df[maids_df["maid_id"] == mid].iloc[0]
                             st.markdown(f"### Maid {maid_row['maid_id']}")
-                            for col in maid_cols + lang_cols:
-                                value = maid_row[col]
-                                st.markdown(f"**{col.replace('_', ' ').capitalize()}:** {value}")
-
+                            maid_row = maid_row.fillna("unspecified")
+                            languages = [col.replace("maidspeaks_", "").capitalize() for col in lang_cols if maid_row[col] == 1]
+                            cuisines = [c.split("_")[-1].capitalize() for c in ["maid_cooking_lebanese", "maid_cooking_khaleeji", "maid_cooking_international"] if maid_row.get(c, 0) == 1]
+                            
+                            summary_parts = [
+                                f"Maid **{maid_row['maid_id']}** is {maid_row.get('maid_grouped_nationality', 'unspecified')} and speaks {', '.join(languages) if languages else 'no listed languages'}.",
+                                f"She can cook {', '.join(cuisines) if cuisines else 'no specified cuisines'}.",
+                                f"Household preference: {maid_row.get('maidmts_household_type', 'unspecified').replace('_', ' ')}.",
+                                f"Pet preference: {maid_row.get('maidmts_pet_type', 'unspecified').replace('_', ' ')}.",
+                                f"Day-off policy: {maid_row.get('maidmts_dayoff_policy', 'unspecified').replace('_', ' ')}.",
+                                f"Living arrangement: {maid_row.get('maidmts_living_arrangement', 'unspecified').replace('_', ' ')}.",
+                                f"Caregiving profile: {maid_row.get('maidpref_caregiving_profile', 'unspecified').replace('_', ' ')}.",
+                                f"Education: {maid_row.get('maidpref_education', 'unspecified').replace('_', ' ')}.",
+                                f"Personality: {maid_row.get('maidpref_personality', 'unspecified').replace('_', ' ')}.",
+                                f"Travel preference: {maid_row.get('maidpref_travel', 'unspecified').replace('_', ' ')}.",
+                                f"Smoking: {maid_row.get('maidpref_smoking', 'unspecified').replace('_', ' ')}.",
+                                f"Years of experience: {maid_row.get('years_of_experience', 'unspecified')}."
+                            ]
+                            
+                            st.markdown("<br>".join(summary_parts), unsafe_allow_html=True)
 
     # --------------------------------------------
     # Bridge: Prepare data for Summary Metrics tab
