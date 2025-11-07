@@ -707,9 +707,9 @@ if uploaded_file:
     if best_client_df is not None and "Final Score %" in best_client_df.columns:
         best_client_df["match_score_pct"] = best_client_df["Final Score %"]
     
-    # ✅ Diagnostics
-    st.write("Summary Metrics")
-    st.write(f"Tagged: {len(df) if df is not None else 0}, Best: {len(best_client_df) if best_client_df is not None else 0}")
+    # # ✅ Diagnostics
+    # st.write("Summary Metrics")
+    # st.write(f"Tagged: {len(df) if df is not None else 0}, Best: {len(best_client_df) if best_client_df is not None else 0}")
 
 
     # ---------------- Tab 5: Summary Metrics ----------------  
