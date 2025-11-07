@@ -607,9 +607,13 @@ if uploaded_file:
         # Group explorer
         st.markdown("### Group Maids by Feature")
     
+        # feature_choice = st.selectbox(
+        #     "Choose a feature to group by",
+        #     maid_cols + ["maid_speaks_language"]
+        # )
         feature_choice = st.selectbox(
             "Choose a feature to group by",
-            maid_cols + ["maid_speaks_language"]
+            [c for c in maid_cols + ["maid_speaks_language"] if c != "maid_id"]
         )
     
         if feature_choice == "maid_speaks_language":
